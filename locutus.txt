@@ -1,0 +1,264 @@
+OS/2 EMULATOR ("LOCUTUS") DESIGN OUTLINE
+========================================
+Locutus is the name of an emulator designed to support binaries compiled for
+IBM OS/2 on Win32-compatible platforms. It does this via a combination of an
+Intel i386 CPU emulator (to simulate the CPU that OS/2 applications expect
+to run on) and implementations of OS/2 API calls that run on top of Windows.
+
+=== MEMORY LAYOUT ===
+OS/2 1.xx utilized a segment-based memory manager where memory was allocated
+in units of "segments", which corresponded to a linear block of memory up to
+64KB in size, though the segment selector (in protected-mode) had no inherent
+correspondence to the linear base address of the segment. The basic memory
+management primitives would return segment selectors, which the program could
+then subdivide further into smaller chunks to satisfy allocations such as a C
+"malloc". OS/2 executables (stored in the NE format) split the file contents
+into segments. Each segment in the executable corresponded to a segment in
+memory once the executable had been loaded, and the unrelocated code within
+the executable might refer to "segment 1", which would correspond to the 
+first segment within the segment table. At load-time, the relocator would
+replace references to "segment 1" with the actual selector value.
+
+This scheme allowed a simple type of virtual memory on the 80286. By each
+process having its own Local Descriptor Table (LDT), they could all have
+their own mappings between segments and linear/physical addresses. Segments
+could be moved around in physical/linear memory to avoid fragmentation without
+altering the selector in a way totally transparent to the running program, and
+even marked "absent" when flushed to disk (raising an exception if accessed,
+which the kernel could then handle by loading the segment back into memory).
+
+On OS/2 2.0, page-based virtual memory is used instead, with 32-bit OS/2
+programs mostly able to ignore segmentation. However, some OS/2 API calls were
+never updated for 32-bit, forcing programmers to thunk between 32-bit and 16-
+bit code, calling 16-bit procedures from 32-bit code. To ensure that any memory
+addressable by 32-bit OS/2 code could also be addressed reliably from 16-bit
+code, OS/2 2.0 "tiles" the selectors to map the low 512MB of the address space
+(64KB * 8192 selectors). The API calls "DosSelToFlat" and "DosFlatToSel" also
+allow for aliasing between segmented and flat pointers. As a result of this,
+whenever allocating memory in terms of segments on OS/2 2.0, one is in fact
+allocating a block of linear memory using OS/2 2.0's virtual memory manager,
+and then returning the selector corresponding to that linear base address.
+One of the consequences of that on OS/2 2.0 is that the linear address 
+underlying a selector is fixed; segments are not swapped to disk, pages are,
+using the page fault mechanism of the 80386.
+
+The emulation approach allows mimicking this memory layout, regardless of any
+properties of the host platform (such as how selectors are managed on the host
+processor, or the linear memory layout of the host OS). Not only does the 
+emulated 80386 processor have its own LDT with its own set of segments, but in
+order to allow OS/2 2.0 linear executables to load at low linear base
+addresses, a 512MB block of linear memory will be allocated at emulator 
+startup to serve as the "OS/2 arena". Any pointers within emulated code will
+be biased relative to this block, treating its beginning as linear address 0.
+On API call boundaries, pointers will be adjusted. Note that nothing prevents
+OS/2 programs from addressing memory outside of the OS/2 arena (i.e. memory
+from the host OS), the pointers must just be biased to compensate.
+
+
+=== THUNKING ===
+Each system DLL loaded into the address space of an emulated process will
+essentially only contain stubs (and in rare cases, resources) to invoke the 
+emulator. Let's use the API call "DosPutMessage" as an example. Its basic
+signature is:
+APIRET DosPutMessage(HFILE hFile, UINT cbMsg, LPCHAR lpBuf)
+
+For those who may be unaware, APIRET is the standard return value of OS/2 API
+calls, that returns a status code, and essentially is a typedef for the C type
+"unsigned int", meaning that it's an unsigned integer that is 16-bit on 16-bit
+systems and 32-bit on 32-bit systems. HFILE is a file handle, and on 16-bit
+OS/2 is a typedef for the SHANDLE (short handle) type, which maps to "unsigned
+short", but on 32-bit OS/2 is a typedef for LHANDLE (long handle) which maps to
+"unsigned long", meaning that just the same, it is 16-bit or 32-bit depending
+on your word size. Since the same file handles can be used by mixed 16-bit and
+32-bit code within the process, a file handle of course can only have 16 
+significant bits. cbMsg stores the length of the message to be written to the 
+file, and is also an unsigned number that changes size depending on the OS's 
+"bitness". The final parameter is a pointer, which on 16-bit OS/2 is a 16:16 
+segment-offset pointer that takes up 32-bits, but on 32-bit OS/2 is a 32-bit 
+near pointer. Naturally, any signed values would be sign-extended when widened.
+
+Anyways, inside DOSCALL1!DOS16PUTMESSAGE, the code could be
+
+MOV EAX, 1234
+INT 30H
+
+This instruction sequence would be understood by the emulator to be triggering
+a system call (index 0x1234, for example). The emulator will look up the 
+appropriate handler and then execute it, passing a pointer to the CPU's context
+structure. On OS/2, most system calls have both a 16-bit and a 32-bit version,
+meaning that DosPutMessage in reality is exported as Dos16PutMessage and 
+Dos32PutMessage. Besides certain parameters being widened for 32-bit, the
+calling conventions are also different (pascal for 16-bit, cdecl for 32-bit);
+on 16-bit, arguments are pushed in the order provided, while they're pushed in
+reverse-order on 32-bit OS/2.
+
+The gap is resolved by first starting with the host-side implementation of
+DosPutMessage, which takes pointers within the host's address space and returns
+a value, just like one would expect. In this case, it would translate an OS/2
+file handle to a native file handle and invoke the appropriate procedure to
+write to it.
+
+Dos16PutMessage and Dos32PutMessage each get the parameters off of the stack
+and translate any pointers before calling into the real DosPutMessage. Here's
+an example:
+
+void Dos16PutMessage(x86_context_t* pCPU) {
+    WORD arg1 = i386_get_stack_word(0xA);
+    WORD arg2 = i386_get_stack_word(0x8);
+    DWORD arg3 = i386_get_stack_dword(0x4);
+    DWORD farg3 = DosSelToFlat(arg3);
+    pCPU->regs.ax = DosPutMessage(arg1, arg2, farg3);
+}
+
+void Dos32PutMessage(x86_context_t* pCPU) {
+    DWORD arg1 = i386_get_stack_dword(0x4);
+    DWORD arg2 = i386_get_stack_dword(0x8);
+    DWORD arg3 = i386_get_stack_dword(0xC);
+    pCPU->regs.eax = DosPutMessage(arg1, arg2, arg3);
+}
+
+This code could be auto-generated by a line such as this:
+RET DosPutMessage UINT UINT PTR 
+
+This indicates that DosPutMessage is a function that returns a value, and takes
+three parameters: two unsigned integers and then a pointer. The 16-bit thunk 
+will then automatically convert the segmented pointer to a flat pointer.
+
+Other keywords could be added to the thunk compiler to indicate, for example,
+any structures that need to be thunked/converted between 16-bit and 32-bit 
+code.
+
+NOTE: Should Dos16PutMessage (and other such calls) probe the pointer to check
+if it's valid for the length of the message? Depending on selector limits, even
+if the linear address is valid (which it would always be in the emulated
+environment if it resides within the OS/2 arena, and at the behest of the host
+if outside of it), the segment:offset address may not be (though on OS/2 2.0,
+shouldn't all LDT selector limits be 64KB, and it is indeed down to page
+protection?)
+
+
+=== PRESENTATION MANAGER ===
+All GUI programs on OS/2 utilize the "Presentation Manager" API first defined
+in OS/2 1.1. Owing to Microsoft's authorship in OS/2, and a desire to allow
+migration for Windows applications to OS/2, the window management components
+of OS/2 are broadly similar to the APIs in Windows, with many typedefs being
+identical, and function names being almost identical. As a result, many
+Presentation Manager calls can map almost 1:1 with Windows calls. There are
+a few notable exceptions. For example, in OS/2, to register a thread with
+Presentation Manager, one must create an "anchor block", passing the handle
+to it to many subsequent PM calls within the thread. One must also manually
+allocate the message queue on which messages are received. Both are done
+implicitly in Windows, which was designed to have a GUI from the beginning
+(but not initially designed with multithreading in mind).
+
+When registering a window class at the OS/2 level, a corresponding Win32
+window class is registered as well. Notably, it has a "thunk" window 
+procedure, which processes Win32 window messages, and translates them to OS/2
+window messages. Many Win32 window messages closely correspond to OS/2 window
+messages, owing to a shared ancestry, but the message IDs can be different, and
+some of the parameter packing within WPARAM and LPARAM may also be different.
+
+The Win32 window procedure then transfers control to the OS/2 window procedure
+by calling CallPMWindowProc, which takes a window handle, message, LPARAM, and
+WPARAM, and dispatches it to the appropriate callback (re-invoking the
+emulator).
+
+One of the important facts that this process will need to take into account is
+whether the window was created by the 16-bit entry point or the 32-bit entry
+point. Parameters (including pointers and structures) will need to be 
+translated for 16-bit window procedures.
+
+
+=== EXCEPTION HANDLING ===
+There are two ways for exceptions to occur in the emulated environment. Certain
+types of exceptions will be caught by the emulated CPU. For example, certain
+types of math errors, unimplemented instructions, and segmentation-related
+faults will be raised inside of the CPU emulator. Some types of exceptions, 
+such as page faults, are more likely to come from the host OS, which raises a
+page fault in response to an action performed by the emulated CPU (or a thunk
+procedure). 
+
+Once an exception occurs, a translation layer must convert from the host-level
+exceptions to emulated exceptions. OS/2 has two methods of handling exceptions.
+
+In OS/2 1.xx, exception handlers were installed using DosSetVec, which allows
+the programmer to specify a procedure to be invoked when the processor detects
+a specific type of error. This is broadly similar to the MS-DOS style of 
+exception handling, where one sets a handler into the interrupt vector table.
+It is also similar to the Vectored Exception Handling infrastructure present
+since Windows XP.
+
+In OS/2 2.0, the DosSetExceptionHandler API allows one to register an exception
+handler to be placed onto the end of a chain; a linked list of exception 
+handlers threaded through the TIB (Thread Information Block). Each exception
+handler has a pointer to the next exception handler, and can choose either to
+handle an exception itself or hand off to the next one. This is almost
+identical to the "Structured Exception Handling" (SEH) scheme in Win32, but 
+without compiler support for __try / __except blocks. The idea is that instead
+of a global exception handler (like using DosSetVec), you instead set one local
+to the current frame, and then unset it when done with that frame.
+
+In any case, when an exception occurs, the translation layer can scan through 
+the TIB or through the list of exception vectors to find the exception handler
+to call.
+
+
+=== THREAD MANAGEMENT ===
+There is a 1:1 mapping between host OS threads and OS/2 threads. APIs that
+pause, resume, or kill OS/2 threads also ultimately do the same to Win32 
+threads. The primary state recorded by the emulation layer for OS/2 threads is
+the CPU context structure, which is pointed to by a pointer residing within the
+host thread's thread-local-storage (TLS). If an OS/2 call is made to query the
+context of a thread, the host first queries the context of the corresponding
+host thread. If it is also an OS/2 thread (determined by a special signature
+within the TLS array), then its OS/2 CPU context is examined and transferred 
+into the context record.
+
+When creating an OS/2 thread, one supplies the following basic parameters
+- Entry point
+- Parameter
+- Stack address
+
+The TID of the new thread is also returned.
+
+While in the call to DosCreateThread (or equivalent), Locutus first allocates
+a CPU context structure with the stack pointer and instruction pointer set to
+the appropriate addresses. It then creates a new host thread (returning its
+TID), with its parameter set to the address of the CPU context structure. The
+host thread's entry point immediately sets the CPU context structure into
+the appropriate TLS slot, and then uses the emulator to execute the OS/2 thread
+entry point.
+
+NOTE: DosCreateThread is seemingly considerably different between 16-bit and
+32-bit OS/2 (i.e. substantially different parameters), which probably requires
+totally different handlers for each. Notably, it frees us from some of the
+annoying work of setting up a callback for 32-bit vs 16-bit (though the 16-bit
+DosCreateThread doesn't seem to take a parameter, just an already set-up stack,
+while the 32-bit DosCreateThread does - the same host thread entry point can
+probably be used for both after all of the setup is complete)
+
+NOTE: The code listed below is preliminary and doesn't take into account the
+TIB of the OS/2 thread, or have error checking to detect host threads without
+corresponding OS/2 threads, or handle any of the other possible errors that
+could occur
+
+NOTE: Win32 TIDs have 32 significant bits (?) but OS/2 TIDs only have 16 (due
+to interop) - translation table will be needed
+
+
+void Dos16CreateThread(x86_context_t* pCPU) {
+    DWORD PgmAddress = i386_get_stack_dword(0xC);
+    DWORD ThreadIDWord = i386_get_stack_dword(0x8);
+    DWORD NewThreadStack = i386_get_stack_dword(0x4);
+    PWORD pTID = DosSelToFlat(ThreadIDWord);
+    
+    x86_context_t* pNewCPU = i386_new();
+    i386_load_sreg(pNewCPU, CS, PgmAddress >> 16);
+    i386_load_sreg(pNewCPU, SS, NewThreadStack >> 16);
+    pNewCPU->regs.ip = PgmAddress & 0xFFFF;
+    pNewCPU->regs.sp = NewThreadStack & 0xFFFF;
+
+    CreateThread(NULL, 0, LocutusThreadEntry, 
+}
+
+

@@ -1,0 +1,15 @@
+C:\Users\Will\source\repos\nedump\nedump\alu.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\alu.obj
+C:\Users\Will\source\repos\nedump\nedump\dis386.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\dis386.obj
+C:\Users\Will\source\repos\nedump\nedump\doscalls.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\doscalls.obj
+C:\Users\Will\source\repos\nedump\nedump\dump.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\dump.obj
+C:\Users\Will\source\repos\nedump\nedump\i386.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\i386.obj
+C:\Users\Will\source\repos\nedump\nedump\i386ops.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\i386ops.obj
+C:\Users\Will\source\repos\nedump\nedump\main.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\main.obj
+C:\Users\Will\source\repos\nedump\nedump\modldr.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\modldr.obj
+C:\Users\Will\source\repos\nedump\nedump\modrm.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\modrm.obj
+C:\Users\Will\source\repos\nedump\nedump\mte.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\mte.obj
+C:\Users\Will\source\repos\nedump\nedump\names.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\names.obj
+C:\Users\Will\source\repos\nedump\nedump\os2arena.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\os2arena.obj
+C:\Users\Will\source\repos\nedump\nedump\parity.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\parity.obj
+C:\Users\Will\source\repos\nedump\nedump\utils.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\utils.obj
+C:\Users\Will\source\repos\nedump\nedump\x386ops.c;C:\Users\Will\source\repos\nedump\nedump\nedump\x64\Debug\x386ops.obj

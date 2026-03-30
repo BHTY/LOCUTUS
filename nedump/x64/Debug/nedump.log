@@ -1,0 +1,59 @@
+﻿  main.c
+C:\Users\Will\source\repos\nedump\nedump\i386.h(266,9): warning C4005: 'NULL': macro redefinition
+  (compiling source file 'main.c')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\vcruntime.h(230,17):
+      see previous definition of 'NULL'
+  
+C:\Users\Will\source\repos\nedump\nedump\main.c(12,15): warning C4013: 'linear' undefined; assuming extern returning int
+C:\Users\Will\source\repos\nedump\nedump\main.c(62,8): warning C4047: 'initializing': 'char *' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(84,8): warning C4047: 'initializing': 'char *' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(105,8): warning C4047: 'initializing': 'PWORD' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(106,8): warning C4047: 'initializing': 'PBYTE' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(113,9): warning C4047: 'initializing': 'PBYTE' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(127,8): warning C4047: 'initializing': 'PBYTE' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(128,8): warning C4047: 'initializing': 'PBYTE' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(135,8): warning C4047: 'initializing': 'PWORD' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(193,27): warning C4244: 'function': conversion from 'FLATPTR' to 'DWORD', possible loss of data
+C:\Users\Will\source\repos\nedump\nedump\main.c(195,28): warning C4022: 'memcpy': pointer mismatch for actual parameter 2
+C:\Users\Will\source\repos\nedump\nedump\main.c(200,11): warning C4477: 'printf' : format string '%08X' requires an argument of type 'unsigned int', but variadic argument 1 has type 'FLATPTR'
+      C:\Users\Will\source\repos\nedump\nedump\main.c(200,11):
+      consider using '%llX' in the format string
+      C:\Users\Will\source\repos\nedump\nedump\main.c(200,11):
+      consider using '%IX' in the format string
+      C:\Users\Will\source\repos\nedump\nedump\main.c(200,11):
+      consider using '%I64X' in the format string
+  
+C:\Users\Will\source\repos\nedump\nedump\main.c(182,20): warning C4047: 'initializing': 'NE_SEGMENT_ENTRY *' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(203,11): warning C4047: 'initializing': 'char *' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(224,20): warning C4047: 'initializing': 'PNE_RELOC_TABLE' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(317,10): warning C4047: '=': 'PIMAGE_OS2_HEADER' differs in levels of indirection from 'DWORD_PTR'
+C:\Users\Will\source\repos\nedump\nedump\main.c(304,20): warning C4133: 'initializing': incompatible types - from 'char *' to 'PIMAGE_DOS_HEADER'
+C:\Users\Will\source\repos\nedump\nedump\main.c(419,12): warning C4244: '=': conversion from 'WORD' to 'BYTE', possible loss of data
+C:\Users\Will\source\repos\nedump\nedump\main.c(431,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(437,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(440,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(447,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(452,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(457,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(462,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(467,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(472,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(475,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(482,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(485,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(492,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(497,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(502,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(507,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(512,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(517,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(522,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(527,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(532,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(537,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(542,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(547,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(552,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(557,2): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Will\source\repos\nedump\nedump\main.c(332,1): warning C4715: 'LoadNewEXE': not all control paths return a value
+  nedump.vcxproj -> C:\Users\Will\source\repos\nedump\nedump\x64\Debug\nedump.exe

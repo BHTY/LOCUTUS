@@ -1,0 +1,28 @@
+﻿  msg.c
+  os2arena.c
+C:\Users\Will\source\repos\nedump\nedump\os2arena.c(28,2): warning C4047: 'return': 'PVOID' differs in levels of indirection from 'unsigned long'
+  Generating Code...
+C:\Users\Will\source\repos\nedump\nedump\os2arena.c(49,1): warning C4716: 'OS2Alloc': must return a value
+C:\Users\Will\source\repos\nedump\nedump\os2arena.c(44,1): warning C4716: 'OS2Reserve': must return a value
+C:\Users\Will\source\repos\nedump\nedump\msg.c(9,1): warning C4716: 'DosPutMessage': must return a value
+main.obj : error LNK2019: unresolved external symbol __imp____acrt_iob_func referenced in function _printf
+main.obj : error LNK2019: unresolved external symbol __imp__fclose referenced in function _load_file
+main.obj : error LNK2019: unresolved external symbol __imp__fopen referenced in function _load_file
+main.obj : error LNK2019: unresolved external symbol __imp__fread referenced in function _load_file
+main.obj : error LNK2019: unresolved external symbol __imp__fseek referenced in function _load_file
+main.obj : error LNK2019: unresolved external symbol __imp__ftell referenced in function _load_file
+main.obj : error LNK2019: unresolved external symbol __imp____stdio_common_vfprintf referenced in function __vfprintf_l
+main.obj : error LNK2019: unresolved external symbol __imp__malloc referenced in function _load_file
+main.obj : error LNK2019: unresolved external symbol __RTC_CheckEsp referenced in function _DumpNEHeader
+msg.obj : error LNK2001: unresolved external symbol __RTC_CheckEsp
+os2arena.obj : error LNK2001: unresolved external symbol __RTC_CheckEsp
+main.obj : error LNK2001: unresolved external symbol __RTC_InitBase
+msg.obj : error LNK2001: unresolved external symbol __RTC_InitBase
+os2arena.obj : error LNK2001: unresolved external symbol __RTC_InitBase
+main.obj : error LNK2001: unresolved external symbol __RTC_Shutdown
+msg.obj : error LNK2001: unresolved external symbol __RTC_Shutdown
+os2arena.obj : error LNK2001: unresolved external symbol __RTC_Shutdown
+os2arena.obj : error LNK2019: unresolved external symbol _memset referenced in function _InitOS2Arena
+LINK : error LNK2001: unresolved external symbol _mainCRTStartup
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\lib\onecore\x64\MSVCRTD.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
+C:\Users\Will\source\repos\nedump\nedump\Debug\nedump.exe : fatal error LNK1120: 13 unresolved externals
