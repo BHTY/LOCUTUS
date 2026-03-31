@@ -5,6 +5,9 @@ IBM OS/2 on Win32-compatible platforms. It does this via a combination of an
 Intel i386 CPU emulator (to simulate the CPU that OS/2 applications expect
 to run on) and implementations of OS/2 API calls that run on top of Windows.
 
+Assimilating OS/2 into the Windows collective!
+
+
 === MEMORY LAYOUT ===
 OS/2 1.xx utilized a segment-based memory manager where memory was allocated
 in units of "segments", which corresponded to a linear block of memory up to
@@ -261,4 +264,49 @@ void Dos16CreateThread(x86_context_t* pCPU) {
     CreateThread(NULL, 0, LocutusThreadEntry, 
 }
 
+
+=== WINDOWS SUPPORT ===
+16-bit versions of Windows also use the New Executable format, and the OS/2
+executable loader is capable of loading Windows binaries. However, Windows
+applications expect to have certain DLLs available, so Microsoft provided
+reimplementations of Windows 3.0 system DLLs on top of OS/2's APIs known as
+WLO (Windows Libraries for OS/2), code-named "Porthole". These DLLs were also
+used internally by Microsoft to port Windows applications to OS/2.
+
+Executables running under WLO have some limitations compared to those running
+under Windows. For instance, applications running under Windows have full 
+access to the real-mode API surface provided by the BIOS, MS-DOS, and any
+device drivers or TSRs started before Windows launched, through the interrupt-
+based interface. In Windows 3.0, the common, documented BIOS and MS-DOS API 
+calls were translated via the DOS extender to be available in protected-mode,
+and Windows applications in protected-mode also have access to the DOS 
+Protected Mode Interface (DPMI). However, Microsoft's own guidance on
+developing Windows 3.0 apps actually cautioned developers against using the
+MS-DOS (INT 21H) or DPMI (INT 31H) interfaces directly. For cases where
+using MS-DOS was desirable, Windows 3.0 even added the DOS3CALL API, which
+could be slotted in-place of an INT 21H call, with registers set up the same
+way. On Windows, it was a thin wrapper around INT 21H, but on OS/2, which
+lacked the same interrupt-based API surface, it provided a subset of DOS API
+calls available on Windows. Nevertheless, the reason that developers were
+cautioned against using those interfaces directly was that they were not
+present on OS/2.
+
+Adding support for Win16 binaries (even without using WLO) would be a nice
+bonus feature for Locutus. The module loader could be unmodified, but three
+main differences would be there
+1.) The module entry points are called with different parameters on Windows
+2.) Additional thunks would be required for the Win16 API calls, with
+    additional thunk libraries for the core Windows DLLs
+    For maximum compatibility, it would be ideal to run the actual Windows
+    kernel (KRNL386.EXE) directly on top of the emulator, handling any 
+    DPMI calls and so forth that it makes, like WOW for NT does, but it
+    might be easier to supply a fake one
+3.) Support for MS-DOS (and other) APIs would be required
+
+NOTE: Investigate how WINMEM32 creates 32-bit code and data segments... it
+doesn't seem to use DPMI (SELECTORACCESSRIGHTS?) so perhaps it runs on WLO?
+
+
+=== LINEAR EXECUTABLE SUPPORT ===
+Also include support for OS/2 2.0 pre-release LE files as well as LX files?
 
